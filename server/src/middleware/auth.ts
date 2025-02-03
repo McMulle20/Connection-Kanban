@@ -6,8 +6,8 @@ interface JwtPayload {
 }
 
 export const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-  // TODO: verify the token exists and add the user data to the request object
-  const token = req.header('Authorization')?.split(' ')[1]; // Expected format: "Bearer <token>"
+  // Get token from the Authorization header ("Bearer <token>")
+  const token = req.header('Authorization')?.split(' ')[1];
 
   if (!token) {
     return res.status(401).json({ message: 'Token is required' });
@@ -17,8 +17,9 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     if (err) {
       return res.status(403).json({ message: 'Invalid or expired token' });
     }
-   
-    req.user = decoded as JwtPayload; 
+
+    // Add type assertion here to ensure that 'decoded' is of type JwtPayload
+    req.user = decoded as JwtPayload;
 
     next();
   });
