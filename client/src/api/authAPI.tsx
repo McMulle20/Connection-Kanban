@@ -1,26 +1,30 @@
+// utils/auth.ts (or wherever you're implementing this)
 import { UserLogin } from "../interfaces/UserLogin";
 
 const login = async (userInfo: UserLogin) => {
-  // TODO: make a POST request to the login route
   try {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch('/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(userInfo),
+      body: JSON.stringify(userInfo), // Send the userInfo object as the request body
     });
 
-    if (!response.ok) {
-      throw new Error('Login failed');
-    }
+    const data = await response.json(); // Parse the JSON response
 
-    const data = await response.json();
-    localStorage.setItem('token', data.token); // Store JWT token
-    return true;
+    if (response.ok) {
+      // Assuming the server returns a token
+      console.log('Login successful:', data.token);
+      // Store the token or proceed with any post-login actions
+      return data.token;
+    } else {
+      console.error('Login failed:', data.message);
+      return null;
+    }
   } catch (error) {
-    console.error('Login error:', error);
-    return false;
+    console.error('Error during login:', error);
+    return null;
   }
 };
 
