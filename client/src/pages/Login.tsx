@@ -1,4 +1,5 @@
 import { useState, FormEvent, ChangeEvent } from "react";
+
 import Auth from '../utils/auth';
 import { login } from "../api/authAPI";
 
@@ -19,9 +20,7 @@ const Login = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      // Explicitly typing the response to be LoginResponse to avoid any type issues
       const data = await login(loginData);
-      // Now data.token will be available and correctly typed
       Auth.login(data.token);
     } catch (err) {
       console.error('Failed to login', err);
@@ -39,7 +38,7 @@ const Login = () => {
           value={loginData.username || ''}
           onChange={handleChange}
         />
-        <label>Password</label>
+      <label>Password</label>
         <input 
           type='password'
           name='password'
@@ -49,7 +48,8 @@ const Login = () => {
         <button type='submit'>Submit Form</button>
       </form>
     </div>
-  );
+    
+  )
 };
 
 export default Login;
