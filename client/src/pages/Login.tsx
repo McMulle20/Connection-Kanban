@@ -2,12 +2,16 @@ import { useState, FormEvent, ChangeEvent } from "react";
 
 import Auth from '../utils/auth';
 import { login } from "../api/authAPI";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [loginData, setLoginData] = useState({
     username: '',
     password: ''
   });
+
+
+  const navigate = useNavigate(); // Initialize the navigate function
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -22,6 +26,7 @@ const Login = () => {
     try {
       const data = await login(loginData);
       Auth.login(data.token);
+      navigate('/'); // Navigate to the Kanban board (root route) after successful login
     } catch (err) {
       console.error('Failed to login', err);
     }
