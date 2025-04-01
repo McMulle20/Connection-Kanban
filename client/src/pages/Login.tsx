@@ -1,17 +1,12 @@
 import { useState, FormEvent, ChangeEvent } from "react";
-
 import Auth from '../utils/auth';
 import { login } from "../api/authAPI";
-import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [loginData, setLoginData] = useState({
     username: '',
     password: ''
   });
-
-
-  const navigate = useNavigate(); // Initialize the navigate function
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -25,10 +20,17 @@ const Login = () => {
     e.preventDefault();
     try {
       const data = await login(loginData);
-      Auth.login(data.token);
-      navigate('/'); // Navigate to the Kanban board (root route) after successful login
+      
+      // Check if the token exists in the response
+      if (data && data.token) {
+        Auth.login(data.token);  // Proceed if token is returned
+      } else {
+        console.error('Login Failed: No token returned');
+        alert('Login failed, please try again');  // Show alert if no token
+      }
+
     } catch (err) {
-      console.error('Failed to login', err);
+      console.error('Failed to login', err);  // Log any errors
     }
   };
 
@@ -53,8 +55,7 @@ const Login = () => {
         <button type='submit'>Submit Form</button>
       </form>
     </div>
-    
-  )
+  );
 };
 
 export default Login;

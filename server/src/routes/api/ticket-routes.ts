@@ -9,6 +9,17 @@ import {
 
 const router = express.Router();
 
+if (process.env.NODE_ENV === 'development') {
+  router.use((req, _res, next) => {
+    console.log('Ticket Route Debug:', {
+      method: req.method,
+      path: req.path,
+      body: req.body
+    });
+    next();
+  });
+}
+
 // GET /tickets - Get all tickets
 router.get('/', getAllTickets);
 

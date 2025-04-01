@@ -1,29 +1,41 @@
-// utils/auth.ts (or wherever you're implementing this)
 import { UserLogin } from "../interfaces/UserLogin";
 
-const login = async (userInfo: UserLogin) => {
+interface LoginResponse {
+  token: string;
+}
+
+const login = async (loginData: UserLogin): Promise<LoginResponse | null> => {
   try {
+    // Make a POST request to the login route
     const response = await fetch('/auth/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userInfo), // Send the userInfo object as the request body
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(loginData), // Send the loginData object as the request body
     });
 
-    const data = await response.json(); // Parse the JSON response
+    // Read the error response as text
+    const responseText = await response.text(); 
+    console.log('Raw response:', responseText); // Log the raw response to inspect
 
-    if (response.ok) {
-      // Assuming the server returns a token
-      console.log('Login successful:', data.token);
-      // Store the token or proceed with any post-login actions
-      return data.token;
-    } else {
-      console.error('Login failed:', data.message);
+    if (!response.ok) {
+      console.error('Login failed:', responseText); // Log the error message from the server
       return null;
     }
+
+    // Parse the JSON response only if the status is OK
+    if (responseText) {
+      const data: LoginResponse = JSON.parse(responseText); 
+      console.log('Login successful:', data.token); // Log the token from the response
+
+      // Store token in localStorage
+      localStorage.setItem('token', data.token);
+      return data; // Return the token if login is successful
+    }
+
+    console.error('Login Failed: Empty response');
+    return null;
   } catch (error) {
-    console.error('Error during login:', error);
+    console.error('Error during login:', error); // Log any error that occurs during the fetch
     return null;
   }
 };

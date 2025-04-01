@@ -5,14 +5,20 @@ import dotenv from 'dotenv';
 // Load environment variables from .env file
 dotenv.config();
 
+// Extend Express Request type to include user
+declare global {
+  namespace Express {
+    interface Request {
+      user?: JwtPayload;
+    }
+  }
+}
+
 interface JwtPayload {
   username: string;
 }
 
-export const authenticateToken = (req: Request, res: Response, next: NextFunction): any => {
-  // Log the JWT secret key to verify it's being read correctly
-  console.log('JWT Secret Key:', process.env.JWT_SECRET_KEY);
-
+export const authenticateToken = (req: Request, res: Response, next: NextFunction): void | Response => {
   // Get the token from the Authorization header
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -22,16 +28,29 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
   }
 
   try {
-    // Verify the token using the JWT secret synchronously
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+    // Ensure JWT secret key is available
+    const secretKey = process.env.JWT_SECRET_KEY;
+    if (!secretKey) {
+      throw new Error('JWT_SECRET_KEY is not defined');
+    }
 
-    // Assert that the decoded token is of type JwtPayload
-    req.user = decoded as JwtPayload;
+    // Verify the token
+    const decoded = jwt.verify(token, secretKey) as JwtPayload;
+
+    // Attach the decoded user data to the request object
+    req.user = decoded;
 
     // Proceed to the next middleware or route handler
-    next();
-  } catch (err) {
-    // If there is an error (invalid token), send a 403 response
-    return res.status(403).json({ message: 'Access Denied: Invalid Token' });
+    return next();
+  } catch (error) {
+    // Handle specific JWT errors
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({ message: 'Token expired' });
+    }
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+    // General error handler for unexpected errors
+    return res.status(500).json({ message: 'Failed to authenticate token' });
   }
 };
