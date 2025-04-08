@@ -25,8 +25,7 @@ Steps to install and set up your project:
     DB_USER=your_db_user
     DB_PASSWORD=your_db_password
     JWT_SECRET_KEY=your_secret_key
-5. Start the server: npm run dev
-
+5. Start the server: npm run start:dev in project repos cd develop
 ## Usage
 
 User Authentication: Secure login with JWT
@@ -68,3 +67,10 @@ Submit a pull request. For detailed guidelines on contributing, you can refer to
 RenderLink: 
 
 https://dashboard.render.com/web/srv-cug02u23esus73e5l510/deploys/dep-cug02ua3esus73e5l53g
+
+SCreenshots:
+
+![alt text](picA.JPG)
+![alt text](picB.JPG)
+![alt text](deleteticket.JPG)
+![alt text](addticket.JPG)
